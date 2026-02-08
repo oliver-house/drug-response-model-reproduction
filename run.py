@@ -121,7 +121,7 @@ def main():
     report_title = build_report_title(REPORT_CONFIG)
     root = Path(__file__).resolve().parent
     outdir = root / 'outputs'
-    outdir.mkdir(exist_ok=True)
+    outdir.mkdir(exist_ok=True, parents=True)
     tex_path = outdir / 'report.tex'
     results = run_analysis(REPORT_CONFIG)
     json_path = outdir / 'results.json'
