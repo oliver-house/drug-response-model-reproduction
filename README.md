@@ -12,23 +12,23 @@ At a high level, the pipeline consists of three layers:
 
 **Repository Structure**
 
-.
-├── data/
-│   ├── EC11K_Panobinostat.npz
-│   ├── MC9K_Panobinostat.npz
-│   ├── EC11K_Panobinostat_1.npz
-│   ├── EC11K_Panobinostat_2.npz
-│   ├── EC11K_Panobinostat_3.npz
-│   ├── MC9K_Panobinostat_1.npz
-│   ├── MC9K_Panobinostat_2.npz
-│   └── MC9K_Panobinostat_3.npz
-│
-├── compare_and_lime.py
-├── run.py
-├── create.py
-├── outputs/
-│   └── (generated artefacts)
-└── README.md
+. <br>
+├── data/ <br>
+│   ├── EC11K_Panobinostat.npz <br>
+│   ├── MC9K_Panobinostat.npz <br>
+│   ├── EC11K_Panobinostat_1.npz <br>
+│   ├── EC11K_Panobinostat_2.npz <br>
+│   ├── EC11K_Panobinostat_3.npz <br>
+│   ├── MC9K_Panobinostat_1.npz <br>
+│   ├── MC9K_Panobinostat_2.npz <br>
+│   └── MC9K_Panobinostat_3.npz <br>
+│ <br>
+├── compare_and_lime.py <br>
+├── run.py <br>
+├── create.py <br>
+├── outputs/ <br>
+│   └── (generated artefacts) <br>
+└── README.md <br>
 
 **Data artefacts**
 
