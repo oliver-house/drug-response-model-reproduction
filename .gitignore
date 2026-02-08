@@ -1,0 +1,25 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Generated outputs
+outputs/
+*.pdf
+*.json
+
+# LaTeX artefacts
+*.aux
+*.log
+*.out
+*.toc
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

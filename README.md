@@ -2,7 +2,7 @@
 
 Overview
 
-This repository contains a self-contained reproduction study for drug response modelling, focused on panobinostat. The work reproduces (and lightly extends) the methodology of Park et al. (2023) for predicting ln(IC50) from genomic features.
+This repository contains a self-contained reproduction study for drug response modelling, focused on panobinostat. The work reproduces (and lightly extends) the methodology of [Park et al. (2023)](https://www.nature.com/articles/s41598-023-39179-2) for predicting ln(IC50) from genomic features.
 
 At a high level, the pipeline consists of three layers:
 
@@ -12,16 +12,11 @@ At a high level, the pipeline consists of three layers:
 
 **Repository Structure**
 
+*Note: raw data files are not included in this repository; see Data note below*
+
 . <br>
 ├── data/ <br>
-│   ├── EC11K_Panobinostat.npz <br>
-│   ├── MC9K_Panobinostat.npz <br>
-│   ├── EC11K_Panobinostat_1.npz <br>
-│   ├── EC11K_Panobinostat_2.npz <br>
-│   ├── EC11K_Panobinostat_3.npz <br>
-│   ├── MC9K_Panobinostat_1.npz <br>
-│   ├── MC9K_Panobinostat_2.npz <br>
-│   └── MC9K_Panobinostat_3.npz <br>
+│   └── (not included; see Data note) <br>
 │ <br>
 ├── compare_and_lime.py <br>
 ├── run.py <br>
@@ -40,6 +35,14 @@ Targets are ln(IC50) values
 
 Split files (`*_1.npz`, `*_2.npz`, `*_3.npz`) index the train-test splits
 
+**Data note**
+
+The eight `.npz` files used in Park et. al. (2023) and this project were originally obtained from [this repository](https://mega.nz/folder/SXhXTKYK#T1skByytOWobMHa7Hv3j6A). 
+
+As of **8 Feb 2026**, the relevant files appear to be unavailable. 
+
+Filenames in this repository were **slightly renamed for clarity**, while file contents are unchanged.
+
 **Script Overview**
 
 `compare_and_lime.py`: Core functions for ridge regression reproduction and LIME explainability.
@@ -54,4 +57,4 @@ Run `run.py` from the repo root.
 
 Outputs are written to `./outputs/`
 
-A PDF report and json are generated.
+A JSON results file is generated; PDF report generation is optional.

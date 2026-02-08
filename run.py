@@ -12,7 +12,7 @@ from create import (
 )
 
 REPORT_CONFIG = {
-    'build_pdf': True,
+    'build_pdf': False,
     'lime_num_cases': 4,
     'lime_num_features': 10,
     'lime_label': 'EC11K',
