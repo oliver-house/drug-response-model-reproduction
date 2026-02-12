@@ -1,9 +1,18 @@
+"""
+Reporting and output utilities for the panobinostat reproduction study.
+Provides LaTeX rendering, figure generation, and optional PDF compilation
+from computed ridge and LIME results.
+"""
+
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.base import clone
 
 def feature_to_tex(s):
+    """
+    Escape special characters and comparison operators in a string for safe inclusion in LaTeX.
+    """
     s = str(s).replace('_', r'\_')
     s = s.replace('<=', r'\(\le\)')
     s = s.replace('>=', r'\(\ge\)')
@@ -20,6 +29,10 @@ def render_ridge_section(
     cv_n_splits=None, 
     cv_n_repeats=None,
     ):
+    """
+    Render a LaTeX section summarising ridge performance for EC11K and MC9K, including per-split (or CV) results, 
+    summary statistics, and the mean R² difference.
+    """
     ridge_section = ''
     if rows is not None and summaries is not None and delta_r2 is not None:
         if str(compare_mode) == 'provided':
@@ -106,6 +119,10 @@ def render_report_tex(
         fig_scatter_name=None,
         report_title='Panobinostat report',
 ):  
+    """
+    Assemble and return the complete LaTeX document for the report, combining ridge results, figures, 
+    and LIME explanations into a single article template.
+    """
     ridge_section = '\n\n'.join([s for s in ridge_sections if str(s).strip() != ''])
     case_summary_table_body = '\n'.join(
         f"{c['case']} & {int(c['test_row'])} & "
@@ -204,6 +221,9 @@ def render_report_tex(
     return tex
 
 def build_pdf_from_tex(tex_path):
+    """
+    Compile a LaTeX file to PDF using pdflatex and return the resulting PDF path, raising an error if compilation fails.
+    """
     outdir = tex_path.parent
     cmd = [
         'pdflatex', 
@@ -232,6 +252,9 @@ def build_pdf_from_tex(tex_path):
     return pdf_path
 
 def write_figures(outdir, data, model, rows_cv, seed=0):
+    """
+    Generate and save cross-validation R² boxplots and a predicted-vs-observed scatter plot, returning their filenames.
+    """
     if rows_cv is not None and len(rows_cv) > 0:
         r2_ec = [float(r['R2']) for r in rows_cv if r['dataset'] == 'EC11K']
         r2_mc = [float(r['R2']) for r in rows_cv if r['dataset'] == 'MC9K']
@@ -269,6 +292,9 @@ def write_figures(outdir, data, model, rows_cv, seed=0):
     )
 
 def build_report_title(cfg, *, prefix='Panobinostat: '):
+    """
+    Construct a report title from configuration flags indicating which analysis components were run.
+    """
     parts = []
     if bool(cfg.get('run_compare_provided', False)) or bool(cfg.get('run_compare_cv', False)):
         parts.append('Ridge reproduction')

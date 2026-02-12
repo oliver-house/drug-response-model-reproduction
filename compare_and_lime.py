@@ -1,3 +1,9 @@
+"""
+Core evaluation and explainability functions for the panobinostat reproduction study.
+Implements ridge performance comparison under provided splits or repeated stratified
+cross-validation, and LIME-based local explanations for selected test cases.
+"""
+
 import numpy as np
 from sklearn.base import clone
 from sklearn.model_selection import RepeatedStratifiedKFold
@@ -12,6 +18,10 @@ def compare_panobinostat(data,
                          cv_n_repeats=10,
                          cv_y_bins=10,
 ):
+    """
+    Evaluate ridge performance for EC11K and MC9K using either provided splits or repeated stratified cross-validation, 
+    returning per-split metrics, summary statistics, and the mean R² difference.
+    """
     rows = []
     summaries = {}
     for label in data:
@@ -88,6 +98,9 @@ def lime_panobinostat(
         split=1,
         seed=None,
 ):
+    """
+    Fit the model on a specified split and generate LIME explanations for the lowest predicted ln(IC50) test cases.
+    """
     sub = data[label]['splits'][split]
     X_train = sub['X_train']
     y_train = sub['y_train']

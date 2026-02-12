@@ -1,3 +1,10 @@
+"""
+Main entry point for the panobinostat ridge reproduction and LIME analysis.
+Loads pre-packaged EC11K/MC9K artefacts, evaluates ridge performance under
+provided splits and repeated stratified CV, and generates JSON, figures, and
+a LaTeX/PDF report.
+"""
+
 from pathlib import Path
 import json
 import numpy as np
@@ -10,6 +17,8 @@ from create import (
     write_figures, 
     build_report_title, 
 )
+
+# Configuration controlling evaluation, LIME settings, and report generation.
 
 REPORT_CONFIG = {
     'build_pdf': False,
@@ -24,6 +33,9 @@ REPORT_CONFIG = {
 }
 
 def _to_jsonable(x):
+    """
+    Converts NumPy scalars and arrays to native Python types for JSON use
+    """
     if isinstance(x, (np.integer,)):
         return int(x)
     if isinstance(x, (np.floating,)):
@@ -39,6 +51,9 @@ def _to_jsonable(x):
     return x
 
 def load_data(root):
+    """
+    Load EC11K and MC9K panobinostat data and predefined train-test splits
+    """
     data = {}
     for label in ('EC11K', 'MC9K'):
         z = np.load(root / 'data' / f'{label}_Panobinostat.npz')
@@ -56,6 +71,10 @@ def load_data(root):
     return data
 
 def run_analysis(config):
+    """
+    Run ridge reproduction (provided splits and repeated stratified CV) and LIME analysis for panobinostat, 
+    returning all results needed for reporting. 
+    """
     root = Path(__file__).resolve().parent
     model = Ridge(alpha=0.001, solver='svd')
     data = load_data(root)
@@ -118,6 +137,10 @@ def run_analysis(config):
     return results
 
 def main():
+    """
+    Execute the full panobinostat analysis pipeline, writing JSON results, 
+    figures, and a LaTeX report (optionally compiled to PDF) to the outputs directory.
+    """
     report_title = build_report_title(REPORT_CONFIG)
     root = Path(__file__).resolve().parent
     outdir = root / 'outputs'
