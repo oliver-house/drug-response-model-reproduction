@@ -59,6 +59,7 @@ def compare_panobinostat(data,
                 random_state=int(seed),
             )
             for fold_id, (train_idx, test_idx) in enumerate(rskf.split(X, y_bins), start=1):
+                print(f'  {label} CV fold {fold_id}...', flush=True)
                 X_train = X[train_idx]
                 y_train = y[train_idx]
                 X_test = X[test_idx]
@@ -114,6 +115,7 @@ def lime_panobinostat(
     )
     cases = []
     for case_id, idx in enumerate(np.argsort(yhat)[:num_cases], start=1):
+        print(f'  LIME case {case_id}/{num_cases}...', flush=True)
         x_i = X_test[idx]
         pred = float(yhat[idx])
         obs = float(y_test[idx])

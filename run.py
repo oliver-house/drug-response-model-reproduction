@@ -84,6 +84,7 @@ def run_analysis(config):
         'cv_y_bins': int(config.get('cv_y_bins', 10)),
     }
     ridge_sections = []
+    print('Running provided splits...', flush=True)
     rows_p, summaries_p, delta_p = compare_panobinostat(
         data,
         model,
@@ -91,7 +92,9 @@ def run_analysis(config):
         seed=seed,
         **cv_kwargs,
     )
+    print('Provided splits done.', flush=True)
     ridge_sections.append(render_ridge_section(rows_p, summaries_p, delta_p, 'provided'))
+    print('Running CV...', flush=True)
     rows_c, summaries_c, delta_c = compare_panobinostat(
         data,
         model,
@@ -99,11 +102,13 @@ def run_analysis(config):
         seed=seed,
         **cv_kwargs,
     )
+    print('CV done.', flush=True)
     ridge_sections.append(render_ridge_section(
         rows_c, summaries_c, delta_c, 'cv',
         cv_n_splits=cv_kwargs['cv_n_splits'],
         cv_n_repeats=cv_kwargs['cv_n_repeats'],
     ))
+    print('Running LIME...', flush=True)
     lime_data = lime_panobinostat(
         data,
         model,
@@ -113,6 +118,7 @@ def run_analysis(config):
         split=int(config.get('lime_split', 1)),
         seed=seed,
     )
+    print('LIME done.', flush=True)
     results = {
         'seed': seed,
         'config': dict(config),
