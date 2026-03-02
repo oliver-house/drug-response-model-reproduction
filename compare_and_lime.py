@@ -43,8 +43,7 @@ def compare_panobinostat(data,
                 rmse_list.append(rmse)
         elif mode == 'cv':
             X = data[label]['X']
-            y = data[label]['y'].reshape(-1)
-            y = np.asarray(y, dtype=float)
+            y = np.asarray(data[label]['y'].reshape(-1), dtype=float)
             bins = int(cv_y_bins)
             if bins < 2:
                 bins = 2
@@ -59,9 +58,7 @@ def compare_panobinostat(data,
                 n_repeats=int(cv_n_repeats),
                 random_state=int(seed),
             )
-            fold_id = 0
-            for train_idx, test_idx in rskf.split(X, y_bins):
-                fold_id += 1
+            for fold_id, (train_idx, test_idx) in enumerate(rskf.split(X, y_bins), start=1):
                 X_train = X[train_idx]
                 y_train = y[train_idx]
                 X_test = X[test_idx]
@@ -89,12 +86,11 @@ def compare_panobinostat(data,
     return rows, summaries, delta_r2
 
 def lime_panobinostat(
-        data, 
-        model, 
-        num_cases=4, 
-        num_features=10, 
-        mode='regression', 
-        label='EC11K', 
+        data,
+        model,
+        num_cases=4,
+        num_features=10,
+        label='EC11K',
         split=1,
         seed=None,
 ):
@@ -112,8 +108,8 @@ def lime_panobinostat(
     yhat = m.predict(X_test)
     explainer = LimeTabularExplainer(
         training_data=X_train, 
-        feature_names=[f'gene_{j:05d}' for j in range(n_columns)], 
-        mode=mode,
+        feature_names=[f'gene_{j:05d}' for j in range(n_columns)],
+        mode='regression',
         random_state=seed,
     )
     cases = []

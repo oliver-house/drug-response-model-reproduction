@@ -33,12 +33,13 @@ def render_ridge_section(
     Render a LaTeX section summarising ridge performance for EC11K and MC9K, including per-split (or CV) results, 
     summary statistics, and the mean R² difference.
     """
+    compare_mode = str(compare_mode)
     ridge_section = ''
     if rows is not None and summaries is not None and delta_r2 is not None:
-        if str(compare_mode) == 'provided':
+        if compare_mode == 'provided':
             eval_note = '\\noindent Evaluation uses the 3 provided train-test splits.'
             show_ridge_table = True
-        elif str(compare_mode) == 'cv':
+        elif compare_mode == 'cv':
             n_splits = int(cv_n_splits) if cv_n_splits is not None else 0
             n_repeats = int(cv_n_repeats) if cv_n_repeats is not None else 0
             n_total = n_splits * n_repeats if (n_splits > 0 and n_repeats > 0) else len(rows)
@@ -91,14 +92,14 @@ def render_ridge_section(
         ridge_section = '\n'.join((
             (
                 '\\section{{Ridge reproduction (provided splits): EC11K vs MC9K}}'
-                if str(compare_mode) == 'provided'
+                if compare_mode == 'provided'
                 else '\\section{{Ridge reproduction (repeated stratified CV): EC11K vs MC9K}}'
-                if str(compare_mode) == 'cv'
+                if compare_mode == 'cv'
                 else f'\\section{{Ridge reproduction ({feature_to_tex(compare_mode)}): EC11K vs MC9K}}'
             ),
             f'{eval_note}',
             f'{ridge_table_tex}',
-            '\\subsection*{{Summary across folds}}' if str(compare_mode) == 'cv' else '\\subsection*{{Summary across splits}}',
+            '\\subsection*{{Summary across folds}}' if compare_mode == 'cv' else '\\subsection*{{Summary across splits}}',
             '\\begin{center}',
             '\\begin{tabular}{lrr}',
             '\\toprule',
@@ -231,21 +232,20 @@ def build_pdf_from_tex(tex_path):
         '-halt-on-error', 
         tex_path.name,
     ]
-    for _ in range(2):
-        p = subprocess.run(
-            cmd, 
-            cwd=str(outdir), 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, 
-            text=True,
+    p = subprocess.run(
+        cmd,
+        cwd=str(outdir),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if p.returncode != 0:
+        raise RuntimeError(
+            'pdflatex failed.\n\nSTDOUT:\n'
+            + p.stdout
+            + '\n\nSTDERR:\n'
+            + p.stderr
         )
-        if p.returncode != 0:
-            raise RuntimeError(
-                'pdflatex failed.\n\nSTDOUT:\n'
-                + p.stdout 
-                + '\n\nSTDERR:\n'
-                + p.stderr
-            )
     pdf_path = tex_path.with_suffix('.pdf')
     if not pdf_path.exists():
         raise RuntimeError('pdflatex reported success but PDF was not created.')
@@ -291,19 +291,3 @@ def write_figures(outdir, data, model, rows_cv, seed=0):
         fig2_path.name,
     )
 
-def build_report_title(cfg, *, prefix='Panobinostat: '):
-    """
-    Construct a report title from configuration flags indicating which analysis components were run.
-    """
-    parts = []
-    if bool(cfg.get('run_compare_provided', False)) or bool(cfg.get('run_compare_cv', False)):
-        parts.append('Ridge reproduction')
-    if bool(cfg.get('run_lime', False)):
-        parts.append('LIME')
-    if not parts:
-        return prefix.rstrip(': ')
-    if len(parts) == 1:
-        return prefix + parts[0]
-    if len(parts) == 2:
-        return prefix + parts[0] + ' and ' + parts[1]
-    return prefix + ', '.join(parts[:-1]) + ', and ' + parts[-1]

@@ -11,11 +11,10 @@ import numpy as np
 from sklearn.linear_model import Ridge
 from compare_and_lime import compare_panobinostat, lime_panobinostat
 from create import (
-    render_ridge_section, 
-    render_report_tex, 
-    build_pdf_from_tex, 
-    write_figures, 
-    build_report_title, 
+    render_ridge_section,
+    render_report_tex,
+    build_pdf_from_tex,
+    write_figures,
 )
 
 # Configuration controlling evaluation, LIME settings, and report generation.
@@ -36,11 +35,11 @@ def _to_jsonable(x):
     """
     Converts NumPy scalars and arrays to native Python types for JSON use
     """
-    if isinstance(x, (np.integer,)):
+    if isinstance(x, np.integer):
         return int(x)
-    if isinstance(x, (np.floating,)):
+    if isinstance(x, np.floating):
         return float(x)
-    if isinstance(x, (np.bool_,)):
+    if isinstance(x, np.bool_):
         return bool(x)
     if isinstance(x, np.ndarray):
         return x.tolist()
@@ -100,11 +99,10 @@ def run_analysis(config):
         seed=seed,
         **cv_kwargs,
     )
-    rows_cv = rows_c
     ridge_sections.append(render_ridge_section(
         rows_c, summaries_c, delta_c, 'cv',
-        cv_n_splits=int(config.get('cv_n_splits', 5)),
-        cv_n_repeats=int(config.get('cv_n_repeats', 10)),
+        cv_n_splits=cv_kwargs['cv_n_splits'],
+        cv_n_repeats=cv_kwargs['cv_n_repeats'],
     ))
     lime_data = lime_panobinostat(
         data,
@@ -132,7 +130,6 @@ def run_analysis(config):
         'data': data,
         'model': model,
         'ridge_sections': ridge_sections,
-        'rows_cv': rows_cv,
     }
     return results
 
@@ -141,7 +138,7 @@ def main():
     Execute the full panobinostat analysis pipeline, writing JSON results, 
     figures, and a LaTeX report (optionally compiled to PDF) to the outputs directory.
     """
-    report_title = build_report_title(REPORT_CONFIG)
+    report_title = 'Panobinostat: Ridge reproduction and LIME'
     root = Path(__file__).resolve().parent
     outdir = root / 'outputs'
     outdir.mkdir(exist_ok=True, parents=True)
@@ -149,22 +146,23 @@ def main():
     results = run_analysis(REPORT_CONFIG)
     json_path = outdir / 'results.json'
     with json_path.open('w', encoding='utf-8') as f:
-         json.dump(_to_jsonable({
-              'seed': results['seed'], 
-              'config': results['config'], 
-              'provided': results['provided'], 
-              'cv': results['cv'], 
-              'lime_data': results['lime_data']
-              }),
-              f,
-              indent=2,
-              sort_keys=True,
+        json.dump(
+            _to_jsonable({
+                'seed': results['seed'],
+                'config': results['config'],
+                'provided': results['provided'],
+                'cv': results['cv'],
+                'lime_data': results['lime_data'],
+            }),
+            f,
+            indent=2,
+            sort_keys=True,
         )
     data = results['data']
     model = results['model']
     seed = results['seed']
     ridge_sections = results['ridge_sections']
-    rows_cv = results['rows_cv']
+    rows_cv = results['cv']['rows']
     lime_data = results['lime_data']
     fig_cv_name, fig_scatter_name = write_figures(
         outdir=outdir,
@@ -181,7 +179,7 @@ def main():
         report_title=report_title,
     )
     tex_path.write_text(tex, encoding='utf-8')
-    if bool(REPORT_CONFIG.get('build_pdf', True)):
+    if REPORT_CONFIG.get('build_pdf', False):
         try:
             build_pdf_from_tex(tex_path)
         except FileNotFoundError:
